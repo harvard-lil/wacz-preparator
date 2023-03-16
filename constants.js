@@ -1,12 +1,14 @@
-import { dirname } from 'path'
+import fs from 'fs/promises'
+import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
 import chalk from 'chalk'
 
 /**
- * Default for the total of requests that can be run in parallel.
+ * Path to the library.
+ * @constant
  */
-export const CONCURRENCY_DEFAULT = 50
+export const BASE_PATH = dirname(fileURLToPath(import.meta.url))
 
 /**
  * Archive IT base API URL
