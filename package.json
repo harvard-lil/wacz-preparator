@@ -1,0 +1,34 @@
+{
+  "name": "wacz-preparator",
+  "version": "0.0.1",
+  "description": "CLI and JavaScript library for compiling an Archive-It collection into a single WACZ file.",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "wacz-preparator": "./bin/cli.js"
+  },
+  "scripts": {
+    "test": "node --test",
+    "lint": "standard",
+    "lint-autofix": "standard --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/harvard-lil/wacz-preparator.git"
+  },
+  "author": "Harvard Library Innovation Lab",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/harvard-lil/wacz-preparator/issues"
+  },
+  "homepage": "https://github.com/harvard-lil/wacz-preparator#readme",
+  "dependencies": {
+    "@harvard-lil/js-wacz": "^0.0.8",
+    "commander": "^10.0.0",
+    "node-html-parser": "^6.1.5",
+    "warcio": "^2.0.1"
+  },
+  "devDependencies": {
+    "standard": "^17.0.0"
+  }
+}
