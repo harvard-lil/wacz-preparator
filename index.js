@@ -1,5 +1,3 @@
-/// <reference path="./index.types.js" />
-
 import { readFile, rm, mkdir, access, appendFile, readdir } from 'fs/promises'
 import { WritableStream } from 'node:stream/web'
 import { constants as fsConstants } from 'node:fs'
@@ -12,6 +10,7 @@ import { parse as parseHTML } from 'node-html-parser'
 import { WACZ } from '@harvard-lil/js-wacz'
 
 import * as CONSTANTS from './constants.js'
+import { ArchiveItWARCReference, ArchiveItCrawledUrl } from './index.types.js'
 
 /**
  * Downloads all the available WARCs of an Archive It collection and puts them into an indexed WACZ file.
@@ -79,7 +78,15 @@ export class Preparator {
   pages = []
 
   /**
-   * @param {PreparatorOptions} options
+   * @param {object} options
+   * @param {string} options.username - Archive It API username.
+   * @param {string} options.password - Archive It API password.
+   * @param {number} options.collectionId - Id of the Archive It collection to prepare.
+   * @param {number} [options.outputPath=null] - Path to output (collection temporary files, final WACZ). Will default to current folder.
+   * @param {number} [options.concurrency=50] - Maximum number of requests that can be run in parallel. Defaults to 50.
+   * @param {string} [options.signingUrl=null] - If set, will be used to try and sign the resulting archive. Must be an authsign-compatible API endpoint (https://github.com/webrecorder/authsign).
+   * @param {string} [options.signingToken=null] - Access token to be used in combination with `signingUrl`.
+   * @param {?Console} [options.log=null] - Will be used instead of the Console API for logging, if compatible (i.e: loglevel). Defaults to globalThis.console.
    */
   constructor (options) {
     // We need to process `log` first - as it needs to be used immediately.
@@ -147,7 +154,7 @@ export class Preparator {
 
     // Pull page titles
     try {
-      log.info('Pulling page titles from the Wayback Machine for each entry.')
+      log.info('Pulling page titles for each entry.')
       await this.fetchCrawledUrlsTitle()
     } catch (err) { // Non-blocking
       log.trace(err)
@@ -258,7 +265,7 @@ export class Preparator {
 
     if (options?.outputPath) {
       try {
-        accessSync(options.outputPath)
+        accessSync(options.outputPath, fsConstants.W_OK)
         equal(lstatSync(options.outputPath).isDirectory(), true)
         this.outputPath = options.outputPath
       } catch (err) {
@@ -298,11 +305,11 @@ export class Preparator {
    * @returns {Promise<void>}
    */
   createCollectionFolder = async () => {
-    this.collectionPath = `${this.outputPath}${sep}${this.collectionId}`
+    this.collectionPath = `${this.outputPath}${sep}${this.collectionId}${sep}`
 
     let exists = false
     try {
-      await access(this.collectionPath)
+      await access(this.collectionPath, fsConstants.W_OK)
       exists = true
       this.log.info(`Collection folder ${this.collectionPath} already exists.`)
     } catch (err) {
@@ -311,7 +318,7 @@ export class Preparator {
 
     if (!exists) {
       await mkdir(this.collectionPath)
-      await access(this.collectionPath)
+      await access(this.collectionPath, fsConstants.W_OK)
     }
   }
 
@@ -366,12 +373,12 @@ export class Preparator {
       const parsed = await response.json()
 
       for (const entry of parsed.files) {
-        this.WARCs.push({
-          downloadUrl: entry?.locations ? entry.locations[0] : null,
-          filename: entry?.filename,
-          remoteSHA1Hash: entry?.checksums?.sha1,
-          crawlId: entry?.crawl
-        })
+        const ref = new ArchiveItWARCReference()
+        ref.downloadUrl = entry?.locations ? entry.locations[0] : null
+        ref.filename = entry?.filename
+        ref.remoteSHA1Hash = entry?.checksums?.sha1
+        ref.crawlId = entry?.crawl
+        this.WARCs.push(ref)
       }
 
       // Is there a "next" results page?
@@ -413,16 +420,13 @@ export class Preparator {
 
       const parsed = await response.json()
 
-      if (!ref.crawledUrls) {
-        ref.crawledUrls = []
-      }
-
       for (const seed of parsed) {
-        ref.crawledUrls.push({
-          seedId: seed?.seed_id,
-          url: seed?.seed,
-          timestamp: seed?.timestamp
-        })
+        const crawledUrl = new ArchiveItCrawledUrl()
+        crawledUrl.seedId = seed?.seed_id
+        crawledUrl.url = seed?.seed
+        crawledUrl.timestamp = seed?.timestamp
+
+        ref.crawledUrls.push(crawledUrl)
       }
     }
 
@@ -506,7 +510,10 @@ export class Preparator {
         }
       }
 
-      crawl.title = title
+      if (title) {
+        log.info(`Title found for ${crawl.url}: ${title}`)
+        crawl.title = title
+      }
     }
 
     // Make groups of X CrawledUrls objects for which we need to pull page title.
@@ -556,13 +563,13 @@ export class Preparator {
       inCollection[entry.filename] = true
     }
 
-    for (const filename of await readdir(this.collectionIdPath)) {
+    for (const filename of await readdir(this.collectionPath)) {
       if (filename.endsWith('.warc.gz') && filename in inCollection) {
         continue
       }
 
       log.info(`${filename}: present on disk but not in collection, will be deleted.`)
-      await rm(`${this.collectionIdPath}${filename}`)
+      await rm(`${this.collectionPath}${filename}`)
     }
   }
 
@@ -576,7 +583,7 @@ export class Preparator {
   checkWARCsHashes = async () => {
     for (const entry of this.WARCs) {
       const log = this.log
-      const filepath = `${this.collectionIdPath}${entry.filename}`
+      const filepath = `${this.collectionPath}${entry.filename}`
       entry.downloaded = true
 
       try {
@@ -619,7 +626,7 @@ export class Preparator {
      */
     const fetchOne = async (ref) => {
       log.info(`${ref.filename}: downloading ...`)
-      const filepath = `${this.collectionIdPath}${ref.filename}`
+      const filepath = `${this.collectionPath}${ref.filename}`
       const response = await fetch(ref.downloadUrl, { headers: this.getAuthorizationHeader() })
 
       if (response.status !== 200) {
@@ -695,6 +702,11 @@ export class Preparator {
         continue
       }
 
+      // Skip if there are not crawledUrls entries
+      if (!entry.crawledUrls) {
+        continue
+      }
+
       for (const crawl of entry.crawledUrls) {
         // Skip if entry doesn't have a title
         if (!crawl.title) {
@@ -716,7 +728,7 @@ export class Preparator {
    * @returns {Promise<void>}
    */
   generateWACZ = async () => {
-    this.WACZPath = `${this.collectionPath}${sep}${this.collectionId}.wacz`
+    this.WACZPath = `${this.outputPath}${sep}${this.collectionId}.wacz`
 
     const archive = new WACZ({
       input: `${this.collectionPath}*.warc.gz`,
@@ -739,13 +751,13 @@ export class Preparator {
   }
 
   /**
-   * Prints crawling report.
+   * Prints processing report.
    * @returns {void}
    */
   printReport () {
     const log = this.log
 
-    log.info('Capture process complete.')
+    log.info('📚 Collection is ready.')
 
     // How many files could not be downloaded?
     let notDownloaded = 0
@@ -757,7 +769,7 @@ export class Preparator {
     }
 
     if (notDownloaded) {
-      log.warn(`${this.notDownloaded} of ${this.WARCs.length} WARC files could not be downloaded.`)
+      log.warn(`${this.notDownloaded} of ${this.WARCs.length} WARC files have not been downloaded.`)
     }
 
     log.info(`WACZ file can be found here: ${this.WACZPath}`)
