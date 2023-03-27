@@ -1,7 +1,7 @@
 {
   "name": "wacz-preparator",
   "version": "0.0.1",
-  "description": "CLI and JavaScript library for compiling an Archive-It collection into a single WACZ file.",
+  "description": "📚 CLI and JavaScript library for compiling an Archive-It web archives collection into a single WACZ file.",
   "main": "index.js",
   "type": "module",
   "bin": {

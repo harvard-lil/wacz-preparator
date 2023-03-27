@@ -25,11 +25,11 @@ program
 //
 // Options
 //
-program.requiredOption('-u, --username <string>', 'Archive It API username.')
+program.requiredOption('-u, --username <string>', 'Archive-It API username.')
 
-program.requiredOption('-p, --password <string>', 'Archive It API password.')
+program.requiredOption('-p, --password <string>', 'Archive-It API password.')
 
-program.requiredOption('-i, --collection-id <string>', 'Id of the Archive It collection to process.')
+program.requiredOption('-i, --collection-id <string>', 'Id of the Archive-It collection to process.')
 
 program.addOption(
   new Option('-o, --output-path <string>', 'Path in which wacz-preparator will work.')
@@ -37,7 +37,7 @@ program.addOption(
 )
 
 program.addOption(
-  new Option('-c, --concurrency <number>', 'Sets a limit for parallel requests to the Archive It API.')
+  new Option('-c, --concurrency <number>', 'Sets a limit for parallel requests to the Archive-It API.')
     .default(DEFAULT_CONCURRENCY)
 )
 
@@ -56,7 +56,7 @@ program.addOption(
 )
 
 program.addOption(
-  new Option('--log-level <string>', 'Controls Scoop CLI\'s verbosity.')
+  new Option('--log-level <string>', 'Controls CLI verbosity.')
     .choices(['silent', 'trace', 'debug', 'info', 'warn', 'error'])
     .default('info')
 )

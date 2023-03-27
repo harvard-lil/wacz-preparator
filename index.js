@@ -13,7 +13,7 @@ import * as CONSTANTS from './constants.js'
 import { ArchiveItWARCReference, ArchiveItCrawledUrl } from './index.types.js'
 
 /**
- * Downloads all the available WARCs of an Archive It collection and puts them into an indexed WACZ file.
+ * Downloads all the available WARCs of an Archive-It collection and puts them into an indexed WACZ file.
  * Uses crawl and seed information to build pages.jsonl.
  *
  * Usage:
@@ -39,7 +39,7 @@ export class Preparator {
   outputPath = process.env.PWD
 
   /**
-   * Folder in which the WARCs from Archive It will be stored before being processed.
+   * Folder in which the WARCs from Archive-It will be stored before being processed.
    * @type {?string}
    */
   collectionPath = null
@@ -66,7 +66,7 @@ export class Preparator {
   signingToken = null
 
   /**
-   * Urls of WARCs to pull from Archive It.
+   * Urls of WARCs to pull from Archive-It.
    * @type {ArchiveItWARCReference[]}
    */
   WARCs = []
@@ -79,9 +79,9 @@ export class Preparator {
 
   /**
    * @param {object} options
-   * @param {string} options.username - Archive It API username.
-   * @param {string} options.password - Archive It API password.
-   * @param {number} options.collectionId - Id of the Archive It collection to prepare.
+   * @param {string} options.username - Archive-It API username.
+   * @param {string} options.password - Archive-It API password.
+   * @param {number} options.collectionId - Id of the Archive-It collection to prepare.
    * @param {number} [options.outputPath=null] - Path to output (collection temporary files, final WACZ). Will default to current folder.
    * @param {number} [options.concurrency=50] - Maximum number of requests that can be run in parallel. Defaults to 50.
    * @param {string} [options.signingUrl=null] - If set, will be used to try and sign the resulting archive. Must be an authsign-compatible API endpoint (https://github.com/webrecorder/authsign).
@@ -107,6 +107,8 @@ export class Preparator {
   }
 
   /**
+   * Goes through the entire preparation process.
+   * Will stop and return if a step fails.
    * @returns {Promise<boolean>}
    */
   process = async () => {
@@ -118,13 +120,13 @@ export class Preparator {
       await this.checkCredentials()
     } catch (err) {
       log.trace(err)
-      log.error('Invalid credentials combination, or the Archive It API could not be reached')
+      log.error('Invalid credentials combination, or the Archive-It API could not be reached')
       return false
     }
 
-    // Does a collection-specific folder exist? (+ auto-create)
+    // Create collection-specific folder
     try {
-      log.info('Creating collections folder (if not already present)')
+      log.info('Creating local collection folder (if not already present)')
       await this.createCollectionFolder()
     } catch (err) {
       log.trace(err)
@@ -312,7 +314,7 @@ export class Preparator {
   }
 
   /**
-   * Checks that the credentials that were provided give access to an Archive It collection.
+   * Checks that the credentials that were provided give access to an Archive-It collection.
    * Throws if that is not the case.
    * @returns {Promise<void>}
    */
@@ -355,7 +357,7 @@ export class Preparator {
   }
 
   /**
-   * Pulls information about the current collection from the Archive It API.
+   * Pulls information about the current collection from the Archive-It API.
    * Populates `this.collectionTitle` and `this.collectionDescription`.
    * @returns {Promise<void>}
    */
