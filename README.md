@@ -4,18 +4,9 @@
 
 CLI and JavaScript library for compiling an [Archive-It](https://archive-it.org/) web archives collection into a single [WACZ file](https://specs.webrecorder.net/wacz/1.1.1/).
 
-> ⚠️🥼🧪 **Experimental - feedback needed:**
->
-> This pipeline was originally developed in the context of [The Harvard Library Innovation Lab](https://lil.law.harvard.edu)'s partnership with the [Radcliffe Institute's Schlesinger Library](https://www.radcliffe.harvard.edu/schlesinger-library) on [experimental access to web archives](https://www.schlesinger-metooproject-radcliffe.org/access-the-collection).
->
-> We have only tested it on [The Schlesinger #meToo Web Archives collection](https://www.schlesinger-metooproject-radcliffe.org/web-archives) and would welcome feedback from the community to help solidify it.
->
-> In particular, we would love to hear more about:
-> - Any edge cases this pipeline currently doesn't account for.
-> - General interest in exporting web archives collections from Archive-It and self-hosting web archives exhibits. 
-> - Interest in a desktop app version of this pipeline.
-> 
-> **Contact**: `info@perma.cc`
+```bash
+wacz-preparator --username "lil" --password $PASSWORD --collection 12345
+```
 
 **See also:** [warc-embed](https://github.com/harvard-lil/warc-embed) for embedding a self-contained web archive collection on a web page. 
 
@@ -24,11 +15,32 @@ CLI and JavaScript library for compiling an [Archive-It](https://archive-it.org/
 ---
 
 ## Summary
+- [Foreword](#foreword)
 - [How does it work?](#how-does-it-work)
 - [Getting Started](#getting-started)
 - [CLI](#cli)
 - [JavaScript library](#javascript-library)
 - [Development](#development)
+
+---
+
+## Foreword
+
+⚠️🥼🧪 **Experimental - feedback needed:**
+
+This pipeline was originally developed in the context of [The Harvard Library Innovation Lab](https://lil.law.harvard.edu)'s partnership with the [Radcliffe Institute's Schlesinger Library](https://www.radcliffe.harvard.edu/schlesinger-library) on [experimental access to web archives](https://www.schlesinger-metooproject-radcliffe.org/access-the-collection).
+
+We have only tested it on [The Schlesinger #meToo Web Archives collection](https://www.schlesinger-metooproject-radcliffe.org/web-archives) and would welcome feedback from the community to help solidify it.
+
+In particular, we would love to hear more about:
+
+Any edge cases this pipeline currently doesn't account for.
+- General interest in exporting web archives collections from Archive-It and self-hosting web archives exhibits. 
+- Interest in a desktop app version of this pipeline.
+
+**Contact**: `info@perma.cc`
+
+[👆 Back to the summary](#summary)
 
 ---
 
