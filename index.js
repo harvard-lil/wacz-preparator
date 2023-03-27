@@ -98,7 +98,7 @@ export class Preparator {
           typeof this.log.warn !== 'function' ||
           typeof this.log.error !== 'function'
       ) {
-        throw new Error('"log" must be compatible with the Console API.')
+        throw new Error('"log" must be compatible with the Console API')
       }
     }
 
@@ -118,7 +118,7 @@ export class Preparator {
       await this.checkCredentials()
     } catch (err) {
       log.trace(err)
-      log.error('Invalid credentials combination, or the Archive It API could not be reached.')
+      log.error('Invalid credentials combination, or the Archive It API could not be reached')
       return false
     }
 
@@ -128,7 +128,7 @@ export class Preparator {
       await this.createCollectionFolder()
     } catch (err) {
       log.trace(err)
-      log.error('Collections folder could not be accessed or created.')
+      log.error('Collections folder could not be accessed or created')
       return false
     }
 
@@ -138,7 +138,7 @@ export class Preparator {
       await this.fetchCollectionInfo()
     } catch (err) {
       log.trace(err)
-      log.error('An error occurred while pulling collection information.')
+      log.error('An error occurred while pulling collection information')
       return false
     }
 
@@ -146,10 +146,10 @@ export class Preparator {
     try {
       log.info(`Listing WARC files from collection ${this.collectionId}`)
       await this.fetchWARCsList()
-      log.info(`${this.WARCs.length} entries found in total.`)
+      log.info(`${this.WARCs.length} entries found in total`)
     } catch (err) {
       log.trace(err)
-      log.error('An error occurred while listing WARC files from collection.')
+      log.error('An error occurred while listing WARC files from collection')
       return false
     }
 
@@ -158,7 +158,7 @@ export class Preparator {
       log.info('Pulling crawl and seed information for each entry')
       await this.fetchWARCsCrawlInfo()
     } catch (err) {
-      log.error('An error occurred while listing WARC files from collection.')
+      log.error('An error occurred while listing WARC files from collection')
       log.trace(err)
       return false
     }
@@ -169,7 +169,7 @@ export class Preparator {
       await this.fetchCrawledUrlsTitle()
     } catch (err) { // Non-blocking
       log.trace(err)
-      log.error('An error occurred while pulling page titles from the Wayback Machine.')
+      log.error('An error occurred while pulling page titles')
     }
 
     // Delete WARCs that may be already present in collection folder,
@@ -178,7 +178,7 @@ export class Preparator {
       log.info('Deleting "loose" .warc.gz files (present in folder, but not referenced in collection)')
       await this.deleteLooseWARCs()
     } catch (err) {
-      log.error('An error occurred while deleting loose WARC files.')
+      log.error('An error occurred while deleting loose WARC files')
       log.trace(err)
       return false
     }
@@ -224,7 +224,7 @@ export class Preparator {
       log.info('Preparing WACZ file')
       await this.generateWACZ()
     } catch (err) {
-      log.error('An error occurred while preparing WACZ file.')
+      log.error('An error occurred while preparing WACZ file')
       log.trace(err)
       return false
     }
@@ -246,7 +246,7 @@ export class Preparator {
       notEqual(this.username.length, 0)
     } catch (err) {
       log.trace(err)
-      throw new Error('"username" must be provided.')
+      throw new Error('"username" must be provided')
     }
 
     try {
@@ -254,7 +254,7 @@ export class Preparator {
       notEqual(this.password.length, 0)
     } catch (err) {
       log.trace(err)
-      throw new Error('"password" must be provided.')
+      throw new Error('"password" must be provided')
     }
 
     try {
@@ -263,7 +263,7 @@ export class Preparator {
       equal(this.collectionId > 0, true)
     } catch (err) {
       log.trace(err)
-      throw new Error('"collectionId" must be provided.')
+      throw new Error('"collectionId" must be provided')
     }
   }
 
@@ -281,7 +281,7 @@ export class Preparator {
         this.outputPath = options.outputPath
       } catch (err) {
         log.trace(err)
-        log.warn(`Provided "outputPath" is not a directory or cannot be accessed. Using ${this.outputPath} instead.`)
+        log.warn(`Provided "outputPath" is not a directory or cannot be accessed. Using ${this.outputPath} instead`)
       }
     }
 
@@ -293,7 +293,7 @@ export class Preparator {
         this.concurrency = concurrency
       } catch (err) {
         log.trace(err)
-        log.warn(`"concurrency" was not provided or is not a directory. Using ${this.concurrency} instead.`)
+        log.warn(`"concurrency" was not provided or is not a directory. Using ${this.concurrency} instead`)
       }
     }
 
@@ -302,7 +302,7 @@ export class Preparator {
         this.signingUrl = new URL(options.signingUrl).href
       } catch (err) {
         log.trace(err)
-        log.warn('Provided "signingUrl" is invalid. Skipping.')
+        log.warn('Provided "signingUrl" is invalid -- skipping')
       }
     }
 
@@ -343,9 +343,9 @@ export class Preparator {
     try {
       await access(this.collectionPath, fsConstants.W_OK)
       exists = true
-      this.log.info(`Collection folder ${this.collectionPath} already exists.`)
+      this.log.info(`Collection folder ${this.collectionPath} already exists`)
     } catch (err) {
-      this.log.info(`Collection folder ${this.collectionPath} needs to be created.`)
+      this.log.info(`Collection folder ${this.collectionPath} needs to be created`)
     }
 
     if (!exists) {
@@ -439,7 +439,7 @@ export class Preparator {
      * @returns {Promise<void>}
      */
     const fetchOne = async (ref) => {
-      log.info(`${ref.filename}: pulling crawl info.`)
+      log.info(`${ref.filename}: pulling crawl info`)
 
       const response = await fetch(
         `${CONSTANTS.ARCHIVE_IT_API_URL}/api/reports/seed/${ref.crawlId}`,
@@ -447,7 +447,7 @@ export class Preparator {
       )
 
       if (response.status !== 200) {
-        throw new Error(`Archive-It API responded with ${response.status} for crawl ID ${ref.crawlId}.`)
+        throw new Error(`Archive-It API responded with ${response.status} for crawl ID ${ref.crawlId}`)
       }
 
       const parsed = await response.json()
@@ -475,7 +475,7 @@ export class Preparator {
         for (const result of results) {
           if (result.status === 'rejected') {
             log.trace(result.reason)
-            log.warn('A request to pull crawl info failed. Skipping.')
+            log.warn('A request to pull crawl info failed -- skipping')
           }
         }
 
@@ -517,7 +517,7 @@ export class Preparator {
             title = parsed.metadata.Title[0].value
           }
         } catch (err) {
-          log.info(`An error occurred while trying to pull seed information for ${crawl.seedId}.`)
+          log.info(`An error occurred while trying to pull seed information for ${crawl.seedId}`)
           log.trace(err)
         }
       }
@@ -537,16 +537,16 @@ export class Preparator {
             title = title === 'Archive-it Wayback' ? null : html.querySelector('title').textContent
           }
         } catch (err) {
-          log.info(`An error occurred while trying to retrieve the archived page title from ${waybackUrl}.`)
+          log.info(`An error occurred while trying to retrieve the archived page title from ${waybackUrl}`)
           log.trace(err)
         }
       }
 
       if (title) {
-        log.info(`Title found for ${crawl.url}: ${title}`)
+        // log.info(`Title found for ${crawl.url}: ${title}`)
         crawl.title = title
       } else {
-        this.log.warn(`No title found for ${crawl.url}.`)
+        this.log.warn(`No title found for ${crawl.url}`)
       }
     }
 
@@ -602,7 +602,7 @@ export class Preparator {
         continue
       }
 
-      log.info(`${filename}: present on disk but not in collection, will be deleted.`)
+      log.info(`${filename}: present on disk but not in collection, will be deleted`)
       await rm(`${this.collectionPath}${filename}`)
     }
   }
@@ -628,16 +628,16 @@ export class Preparator {
       }
 
       try {
-        log.info(`${entry.filename}: present on disk, checking hash.`)
+        log.info(`${entry.filename}: present on disk, checking hash`)
         entry.localSHA1Hash = crypto.createHash('sha1').update(await readFile(filepath)).digest('hex')
       } catch (err) {
         log.trace(err)
-        log.error(`${entry.filename}: error occurred while calculating SHA-1 hash.`)
+        log.error(`${entry.filename}: error occurred while calculating SHA-1 hash`)
         entry.downloaded = false
       }
 
       if (entry.localSHA1Hash && entry.localSHA1Hash !== entry.remoteSHA1Hash) {
-        log.error(`${entry.filename}: remote and local SHA-1 hash mismatch. Deleting local copy.`)
+        log.error(`${entry.filename}: remote and local SHA-1 hash mismatch -- deleting local copy`)
         await rm(filepath)
         entry.downloaded = false
       }
@@ -664,7 +664,7 @@ export class Preparator {
       const response = await fetch(ref.downloadUrl, { headers: this.getAuthorizationHeader() })
 
       if (response.status !== 200) {
-        throw new Error(`Archive-It API responded with ${response.status} for ${ref.downloadUrl}.`)
+        throw new Error(`Archive-It API responded with ${response.status} for ${ref.downloadUrl}`)
       }
 
       try {
@@ -791,7 +791,7 @@ export class Preparator {
   printReport = () => {
     const log = this.log
 
-    log.info('📚 Collection is ready.')
+    log.info('📚 Collection is ready')
 
     // How many files could not be downloaded?
     let notDownloaded = 0
@@ -803,7 +803,7 @@ export class Preparator {
     }
 
     if (notDownloaded) {
-      log.warn(`${this.notDownloaded} of ${this.WARCs.length} WARC files have not been downloaded.`)
+      log.warn(`${this.notDownloaded} of ${this.WARCs.length} WARC files have not been downloaded`)
     }
 
     log.info(`WACZ file can be found here: ${this.WACZPath}`)

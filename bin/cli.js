@@ -147,6 +147,12 @@ program.action(async (name, options, command) => {
   //
   // Handle --auto-clear option
   //
+  if (options.autoClear === true) {
+    collection.log.info('Clearing collection folder.')
+    await collection.clear()
+  }
+
+  process.exit(0)
 })
 
 program.parse()
