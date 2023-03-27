@@ -2,7 +2,7 @@ import { readFile, rm, mkdir, access, appendFile, readdir } from 'fs/promises'
 import { WritableStream } from 'node:stream/web'
 import { constants as fsConstants } from 'node:fs'
 import { equal, notEqual } from 'node:assert'
-import { accessSync, lstatSync, mkdirSync } from 'fs'
+import { accessSync, lstatSync } from 'fs'
 import crypto from 'crypto'
 import { sep } from 'path'
 
@@ -111,6 +111,15 @@ export class Preparator {
    */
   process = async () => {
     const log = this.log
+
+    // Check credentials
+    try {
+      await this.checkCredentials()
+    } catch (err) {
+      log.trace(err)
+      log.error('Invalid credentials combination, or the Archive It API could not be reached.')
+      return false
+    }
 
     // Does a collection-specific folder exist? (+ auto-create)
     try {
@@ -297,6 +306,27 @@ export class Preparator {
 
     if (this.signingUrl && options?.signingToken) {
       this.signingToken = `${options.signingToken}`
+    }
+  }
+
+  /**
+   * Checks that the credentials that were provided give access to an Archive It collection.
+   * Throws if that is not the case.
+   * @returns {Promise<void>}
+   */
+  checkCredentials = async () => {
+    const baseUrl = `${CONSTANTS.ARCHIVE_IT_API_URL}/api/collection`
+    const params = new URLSearchParams()
+    params.append('limit', 1)
+    params.append('id', this.collectionId)
+
+    const response = await fetch(`${baseUrl}?${params}`, {
+      method: 'HEAD',
+      headers: this.getAuthorizationHeader()
+    })
+
+    if (response.status !== 200) {
+      throw new Error(`Archive-It API responded with ${response.status}`)
     }
   }
 
@@ -513,6 +543,8 @@ export class Preparator {
       if (title) {
         log.info(`Title found for ${crawl.url}: ${title}`)
         crawl.title = title
+      } else {
+        this.log.warn(`No title found for ${crawl.url}.`)
       }
     }
 
@@ -754,7 +786,7 @@ export class Preparator {
    * Prints processing report.
    * @returns {void}
    */
-  printReport () {
+  printReport = () => {
     const log = this.log
 
     log.info('📚 Collection is ready.')
@@ -779,14 +811,16 @@ export class Preparator {
    * Deletes the collection folder and its contents.
    * @returns {Promise<void>}
    */
-  async clear () {
-    await rm(this.collectionPath, { force: true, recursive: true })
+  clear = async () => {
+    if (this.collectionPath) {
+      await rm(this.collectionPath, { force: true, recursive: true })
+    }
   }
 
   /**
    * @return {{Authorization: string}}
    */
-  getAuthorizationHeader () {
+  getAuthorizationHeader = () => {
     const payload = Buffer.from(this.username + ':' + this.password).toString('base64')
     return { Authorization: `Basic ${payload}` }
   }

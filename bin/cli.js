@@ -1,5 +1,6 @@
 #! /usr/bin/env node
 
+import { equal as assert } from 'node:assert/strict'
 import fs from 'fs/promises'
 import path from 'path'
 
@@ -25,26 +26,26 @@ program
 //
 // Options
 //
-program.addOption(
-  new Option('-u, --username <string>', 'Archive It API username.')
-)
+program.requiredOption('-u, --username <string>', 'Archive It API username.')
+
+program.requiredOption('-p, --password <string>', 'Archive It API password.')
+
+program.requiredOption('-i, --collection-id <string>', 'Id of the Archive It collection to process.')
 
 program.addOption(
-  new Option('-p, --password <string>', 'Archive It API password.')
-)
-
-program.addOption(
-  new Option('-i, --collection-id <string>', 'Id of the Archive It collection to process.')
-)
-
-program.addOption(
-  new Option('-o, --output <string>', 'Path in which wacz-preparator will work.')
+  new Option('-o, --output-path <string>', 'Path in which wacz-preparator will work.')
     .default(process.env.PWD)
 )
 
 program.addOption(
-  new Option('-c, --concurrency <string>', 'Sets a limit for parallel requests to the Archive It API.')
+  new Option('-c, --concurrency <number>', 'Sets a limit for parallel requests to the Archive It API.')
     .default(50)
+)
+
+program.addOption(
+  new Option('--auto-clear <bool>', 'Automatically delete the collection-specific folder that was created?')
+    .choices(['true', 'false'])
+    .default('false')
 )
 
 program.addOption(
@@ -65,6 +66,45 @@ program.addOption(
 // Run
 //
 program.action(async (name, options, command) => {
+  /** @type {?Preparator} */
+  let collection = null
+
+  //
+  // Process options
+  //
+  options = options._optionValues
+
+  // `options.username`, `options.password` and `options.collectionId` must be present
+  if (!options?.username) {
+    console.error('No Archive-It username provided.')
+    process.exit(1)
+  }
+
+  if (!options?.password) {
+    console.error('No Archive-It password provided.')
+    process.exit(1)
+  }
+
+  if (!options?.collectionId) {
+    console.error('No Archive-It collection Id provided.')
+    process.exit(1)
+  }
+
+  // `options.outputPath` must be a folder and must be accessible.
+  try {
+    await fs.access(options.outputPath)
+
+    const isDirectory = (await fs.lstat(options.outputPath)).isDirectory()
+    assert(isDirectory, true)
+  } catch (err) {
+    console.error(`Output path does not exist or is not accessible: "${options.outputPath}"`)
+    process.exit(1)
+  }
+
+  // Type conversions
+  options.autoClear = options.autoClear === 'true'
+  options.concurrency = Number(options.concurrency)
+
   //
   // Set log output level and formatting
   //
@@ -87,12 +127,26 @@ program.action(async (name, options, command) => {
   log.info(`Log output level as been set to ${level}.`)
 
   //
-  // Check required params
-  //
-
-  //
   // Initialize Preparator
   //
+  try {
+    collection = new Preparator({ ...options, log })
+  } catch (_err) {
+    process.exit(1) // Logging handled by Preparator
+  }
 
-  console.log(options)
+  //
+  // Start assembling
+  //
+  try {
+    await collection.process()
+  } catch (err) {
+    process.exit(1) // Logging handled by Preparator
+  }
+
+  //
+  // Handle --auto-clear option
+  //
 })
+
+program.parse()
