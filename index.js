@@ -114,6 +114,7 @@ export class Preparator {
 
     // Check credentials
     try {
+      log.info('Checking credentials combination')
       await this.checkCredentials()
     } catch (err) {
       log.trace(err)
@@ -123,6 +124,7 @@ export class Preparator {
 
     // Does a collection-specific folder exist? (+ auto-create)
     try {
+      log.info('Creating collections folder (if not already present)')
       await this.createCollectionFolder()
     } catch (err) {
       log.trace(err)
@@ -132,7 +134,7 @@ export class Preparator {
 
     // Grab collection info
     try {
-      log.info(`Pulling collection information for ${this.collectionId} ...`)
+      log.info(`Pulling collection information for ${this.collectionId}`)
       await this.fetchCollectionInfo()
     } catch (err) {
       log.trace(err)
@@ -142,7 +144,7 @@ export class Preparator {
 
     // List WARCs
     try {
-      log.info(`Listing WARC files from collection ${this.collectionId} ...`)
+      log.info(`Listing WARC files from collection ${this.collectionId}`)
       await this.fetchWARCsList()
       log.info(`${this.WARCs.length} entries found in total.`)
     } catch (err) {
@@ -153,7 +155,7 @@ export class Preparator {
 
     // Pull crawl / seed infos
     try {
-      log.info('Pulling crawl and seed information for each entry.')
+      log.info('Pulling crawl and seed information for each entry')
       await this.fetchWARCsCrawlInfo()
     } catch (err) {
       log.error('An error occurred while listing WARC files from collection.')
@@ -163,7 +165,7 @@ export class Preparator {
 
     // Pull page titles
     try {
-      log.info('Pulling page titles for each entry.')
+      log.info('Pulling page titles for each entry')
       await this.fetchCrawledUrlsTitle()
     } catch (err) { // Non-blocking
       log.trace(err)
@@ -173,7 +175,7 @@ export class Preparator {
     // Delete WARCs that may be already present in collection folder,
     // but are not (or no longer) part of the collection.
     try {
-      log.info('Deleting "loose" .warc.gz files (present in folder, but not referenced in collection).')
+      log.info('Deleting "loose" .warc.gz files (present in folder, but not referenced in collection)')
       await this.deleteLooseWARCs()
     } catch (err) {
       log.error('An error occurred while deleting loose WARC files.')
@@ -183,7 +185,7 @@ export class Preparator {
 
     // Checksum [1]
     try {
-      log.info('Checking hashes of WARCs that may already be present in collection folder.')
+      log.info('Checking hashes of WARCs that may already be present in collection folder')
       await this.checkWARCsHashes()
     } catch (err) {
       log.error(err)
@@ -192,7 +194,7 @@ export class Preparator {
 
     // Pull WARCs that aren't already present
     try {
-      log.info('Downloading WARCs.')
+      log.info('Downloading WARCs')
       await this.fetchWARCs()
     } catch (err) {
       log.error(err)
@@ -201,7 +203,7 @@ export class Preparator {
 
     // Checksum [2]
     try {
-      log.info('Checking hashes on downloaded WARC collection.')
+      log.info('Checking hashes on downloaded WARC collection')
       await this.checkWARCsHashes()
     } catch (err) {
       log.error(err)
@@ -210,7 +212,7 @@ export class Preparator {
 
     // List pages
     try {
-      log.info('Building pages list.')
+      log.info('Building pages list')
       await this.generatePagesList()
     } catch (err) {
       log.error(err)
@@ -219,7 +221,7 @@ export class Preparator {
 
     // Prepare WACZ
     try {
-      log.info('Preparing WACZ file: this might take a while.')
+      log.info('Preparing WACZ file')
       await this.generateWACZ()
     } catch (err) {
       log.error('An error occurred while preparing WACZ file.')
