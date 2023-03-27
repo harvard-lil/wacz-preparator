@@ -26,7 +26,7 @@ wacz-preparator --username "lil" --password $PASSWORD --collection 12345
 
 ## Foreword
 
-⚠️🥼🧪 **Experimental - feedback needed:**
+⚠️🥼🧪 **Experimental:**
 
 This pipeline was originally developed in the context of [The Harvard Library Innovation Lab](https://lil.law.harvard.edu)'s partnership with the [Radcliffe Institute's Schlesinger Library](https://www.radcliffe.harvard.edu/schlesinger-library) on [experimental access to web archives](https://www.schlesinger-metooproject-radcliffe.org/access-the-collection).
 
@@ -46,26 +46,22 @@ Any edge cases this pipeline currently doesn't account for.
 
 ## How does it work?
 
-**Given a valid combination of credentials, **wacz-preparator** will perform the following steps in order to process an existing Archive-It collection:**
-1. Check validity of credentials and access to the collection.
-2. Create local collection folder if not already present.
-    - Because the underlying files are kept around in that folder, processing can be interrupted, resumed, and run multiple times over.
-3. **Ask Archive-It for:** Collection information.
-4. **Ask Archive-It for:** List of available WARC files.
-5. **Ask Archive-It for:** Pull crawl information for all WARC files.
-    - This includes the different **seeds** they captured.
-6. **Ask Archive-It for:** The page title for all the crawled URLs.
-    - Will first try to fetch that information from the **seed** meta data.
-    - If not available, will try to pull that information from the **Wayback Machine**.
-7. Delete _"loose"_ WARCs from local collection folder.
-    - This comparison allows for discarding WARC files that may have previously been pulled locally but are no longer part of the collection. 
-8. Compare hashes of local WARC files against remote hashes (1)
-    - This allows for determining what files need to be downloaded or re-downloaded.
-9. **Ask Archive-It for:** WARCs 
-10. Compare hashes of local WARC files against remote hashes (1)
-    - At this stage, there should be no discrepancies.
-11. Build pages list.
-12. Prepare WACZ file.
+Given a valid combination of credentials, **wacz-preparator** will perform the following steps in order to prepare an existing Archive-It collection into a single WACZ file.
+
+| # | Description | Notes |
+| --- | --- | -- |
+| 01 | Check validity of credentials and access to the collection | | 
+| 02 | Create local collection folder if not already present | Because the underlying files are kept around in that folder, processing can be interrupted, resumed, and run multiple times over. | 
+| 03 | Pull Collection Information | |
+| 04 | Pull list of available WARC files | |
+| 05 | Pull crawl information for all WARC files | This includes retrieving **seeds** (urls).|
+| 06 | Pull page title for all of the crawled URLs | Will first try to fetch that information from the **seed** meta data. If not available, will try to pull that information from the **Wayback Machine**. |
+| 07 | Delete _"loose"_ WARCs from local collection folder | This comparison allows for discarding WARC files that may have previously been pulled locally but are no longer part of the collection. |
+| 08 | Compare hashes of local WARC files against remote hashes (1) | This allows for determining what files need to be downloaded or re-downloaded. |
+| 09 | Pull WARC files | Only the files that are not already present locally will be pulled. |
+| 10 | Compare hashes of local WARC files against remote hashes (2) | At this stage, there should be no discrepancies. |
+| 11 | Build pages list | | 
+| 12 | Prepare WACZ file | |
 
 At the end of this process, **a WACZ file named after the collection ID should be available (ie: 12345.wacz)**. 
 
