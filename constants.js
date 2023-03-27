@@ -21,6 +21,11 @@ export const ARCHIVE_IT_API_URL = 'https://partner.archive-it.org'
 export const ARCHIVE_IT_PLAYBACK_URL = 'https://wayback.archive-it.org'
 
 /**
+ * Default value for Preparator.concurrency.
+ */
+export const DEFAULT_CONCURRENCY = 40
+
+/**
  * Colors used by the logging function
  */
 export const LOGGING_COLORS = {

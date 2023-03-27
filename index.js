@@ -57,7 +57,7 @@ export class Preparator {
   collectionDescription = null
 
   /** @type {number} */
-  concurrency = 50
+  concurrency = CONSTANTS.DEFAULT_CONCURRENCY
 
   /** @type {?string} */
   signingUrl = null
@@ -517,8 +517,8 @@ export class Preparator {
             title = parsed.metadata.Title[0].value
           }
         } catch (err) {
-          log.info(`An error occurred while trying to pull seed information for ${crawl.seedId}`)
           log.trace(err)
+          log.warn(`An error occurred while trying to pull seed information for ${crawl.seedId}`)
         }
       }
 
@@ -537,8 +537,8 @@ export class Preparator {
             title = title === 'Archive-it Wayback' ? null : html.querySelector('title').textContent
           }
         } catch (err) {
-          log.info(`An error occurred while trying to retrieve the archived page title from ${waybackUrl}`)
           log.trace(err)
+          log.warn(`An error occurred while trying to retrieve the archived page title from ${waybackUrl}`)
         }
       }
 

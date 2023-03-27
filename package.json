@@ -10,7 +10,8 @@
   "scripts": {
     "test": "node --test",
     "lint": "standard",
-    "lint-autofix": "standard --fix"
+    "lint-autofix": "standard --fix",
+    "publish-util": "cd .services/publish ; bash ./run.sh"
   },
   "repository": {
     "type": "git",

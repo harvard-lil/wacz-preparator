@@ -2,14 +2,13 @@
 
 import { equal as assert } from 'node:assert/strict'
 import fs from 'fs/promises'
-import path from 'path'
 
 import { Command, Option } from 'commander'
 import log from 'loglevel'
 import logPrefix from 'loglevel-plugin-prefix'
 
 import { Preparator } from '../index.js'
-import { PACKAGE_INFO, LOGGING_COLORS } from '../constants.js'
+import { PACKAGE_INFO, LOGGING_COLORS, DEFAULT_CONCURRENCY } from '../constants.js'
 
 /** @type {Command} */
 const program = new Command()
@@ -39,7 +38,7 @@ program.addOption(
 
 program.addOption(
   new Option('-c, --concurrency <number>', 'Sets a limit for parallel requests to the Archive It API.')
-    .default(50)
+    .default(DEFAULT_CONCURRENCY)
 )
 
 program.addOption(
