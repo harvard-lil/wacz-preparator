@@ -194,7 +194,7 @@ This codebase uses the [Standard JS](https://standardjs.com/) coding style.
 [JSDoc](https://jsdoc.app/) is used for both documentation and loose type checking purposes on this project.
 
 ### Testing
-> ⚠️ This project doesn't have an automated test suite at the moment.
+> ⚠️ In its current state, this experimental codebase doesn't come with an automated test suite. 
 
 ### Available CLI
 
