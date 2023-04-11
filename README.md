@@ -124,6 +124,24 @@ wacz-preparator --help
   <summary><strong>See: Output of wacz-preparator --help 🔍</strong></summary>
 
 ```
+Usage: wacz-preparator [options]
+
+📚 CLI and Javascript library for packaging a remote web archive collection into a single WACZ file.
+More info: https://github.com/harvard-lil/wacz-preparator
+
+Options:
+  -v, --version                 Display Library and CLI version.
+  -e, --extractor <string>      Web Archiving platform to extract the collection from. (choices: "archive-it", default: "archive-it")
+  -u, --username <string>       API username (required for Archive-it). (default: null)
+  -p, --password <string>       API password (required for Archive-it). (default: null)
+  -i, --collection-id <string>  Id of the collection to process (required for Archive-it). (default: null)
+  -o, --output-path <string>    Path in which wacz-preparator will work. (default: pwd)
+  -c, --concurrency <number>    Sets a limit for parallel requests to the Archive-It API. (default: 50)
+  --auto-clear <bool>           Automatically delete the collection-specific folder that was created? (choices: "true", "false", default: "false")
+  --signing-url <string>        Authsign-compatible endpoint for signing WACZ file.
+  --signing-token <string>      Authentication token to --signing-url, if needed.
+  --log-level <string>          Controls CLI verbosity. (choices: "silent", "trace", "debug", "info", "warn", "error", default: "info")
+  -h, --help                    Show options list.
 ```
 </details>
 
