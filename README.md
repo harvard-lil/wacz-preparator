@@ -2,13 +2,13 @@
 
 [![npm version](https://badge.fury.io/js/@harvard-lil%2Fwacz-preparator.svg)](https://badge.fury.io/js/@harvard-lil%2Fwacz-preparator) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com) [![Linting](https://github.com/harvard-lil/wacz-preparator/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/harvard-lil/wacz-preparator/actions/workflows/lint.yml)
 
-CLI and JavaScript library for compiling an [Archive-It](https://archive-it.org/) web archives collection into a single [WACZ file](https://specs.webrecorder.net/wacz/1.1.1/).
+CLI and Javascript library for packaging a remote web archive collection into a single [WACZ file](https://specs.webrecorder.net/wacz/1.1.1/).
 
 ```bash
-wacz-preparator --username "lil" --password $PASSWORD --collection 12345
+wacz-preparator --extractor "archive-it" --username "lil" --password $PASSWORD --collection 12345
 ```
 
-**See also:** [warc-embed](https://github.com/harvard-lil/warc-embed) for embedding a self-contained web archive collection on a web page. 
+**See also:** [wacz-exhibitor](https://github.com/harvard-lil/wacz-exhibitor) for embedding a self-contained web archive collection on a web page. 
 
 <a href="https://tools.perma.cc"><img src="https://github.com/harvard-lil/tools.perma.cc/blob/main/perma-tools.png?raw=1" alt="Perma Tools" width="150"></a>
 
@@ -34,9 +34,8 @@ We have only tested it on [The Schlesinger #meToo Web Archives collection](https
 
 In particular, we would love to hear more about:
 
-Any edge cases this pipeline currently doesn't account for.
-- General interest in exporting web archives collections from Archive-It and self-hosting web archives exhibits. 
-- Interest in a desktop app version of this pipeline.
+- Any edge cases this pipeline currently doesn't account for.
+- General interest in exploring new ways of storing, copying, and giving access to web archives
 
 **Contact**: `info@perma.cc`
 
@@ -46,7 +45,10 @@ Any edge cases this pipeline currently doesn't account for.
 
 ## How does it work?
 
-Given a valid combination of credentials, **wacz-preparator** will perform the following steps in order to prepare an existing Archive-It collection into a single WACZ file.
+Given a specific extractor and valid combination of credentials, **wacz-preparator** will perform the following steps in order to pull and package a remote web archives collection into a single WACZ file.
+
+
+### Example: Archive-It Extractor
 
 | # | Description | Notes |
 | --- | --- | -- |
@@ -102,17 +104,17 @@ Here are a few examples of how **wacz-preparator** can be used in the command li
 
 ```bash
 # The program needs an Archive-It username, password, and collection-id to operate ...
-wacz-preparator --username 'foo' --password 'bar' --collection-id 12345
+wacz-preparator --extractor "archive-it" --username 'foo' --password 'bar' --collection-id 12345
 
 # ... the latter can / should be passed as an environment variable
-wacz-preparator --username 'foo' --password $PASSWORD --collection-id 12345
+wacz-preparator --extractor "archive-it"  --username 'foo' --password $PASSWORD --collection-id 12345
 
 # Unless specified otherwise with --output-path, wacz-preparator will work in the current directory
-wacz-preparator --output-path "/path/to/directory" --username 'foo' --password $PASSWORD --collection-id 12345
+wacz-preparator --extractor "archive-it"  --output-path "/path/to/directory" --username 'foo' --password $PASSWORD --collection-id 12345
 
 # The resulting WACZ file can be signed using an authsign-compatible endpoint.
 # See: https://specs.webrecorder.net/wacz-auth/0.1.0/#implementations
-wacz-preparator --signing-url "https://example.com/sign" --username foo --password $PASSWORD --collection-id 12345
+wacz-preparator --extractor "archive-it" --signing-url "https://example.com/sign" --username foo --password $PASSWORD --collection-id 12345
 
 # Use --help to list the available options, and see what the defaults are.
 wacz-preparator --help
@@ -122,23 +124,6 @@ wacz-preparator --help
   <summary><strong>See: Output of wacz-preparator --help 🔍</strong></summary>
 
 ```
-Usage: wacz-preparator [options]
-
-📚 CLI and JavaScript library for compiling an Archive-It web archives collection into a single WACZ file.
-More info: https://github.com/harvard-lil/wacz-preparator
-
-Options:
-  -v, --version                 Display Library and CLI version.
-  -u, --username <string>       Archive-It API username.
-  -p, --password <string>       Archive-It API password.
-  -i, --collection-id <string>  Id of the Archive-It collection to process.
-  -o, --output-path <string>    Path in which wacz-preparator will work. (default: "[current folder]")
-  -c, --concurrency <number>    Sets a limit for parallel requests to the Archive-It API. (default: 40)
-  --auto-clear <bool>           Automatically delete the collection-specific folder that was created? (choices: "true", "false", default: "false")
-  --signing-url <string>        Authsign-compatible endpoint for signing WACZ file.
-  --signing-token <string>      Authentication token to --signing-url, if needed.
-  --log-level <string>          Controls CLI verbosity. (choices: "silent", "trace", "debug", "info", "warn", "error", default: "info")
-  -h, --help                    Show options list.
 ```
 </details>
 
@@ -152,9 +137,9 @@ Options:
 
 ### Example: Using the Preparator.process() method
 ```javascript
-import { Preparator } from "@harvard-lil/wacz-preparator"
+import { ArchiveItExtractor } from "@harvard-lil/wacz-preparator"
 
-const collection = new Preparator({
+const collection = new ArchiveItExtractor({
   username: 'username', 
   password: 'password', 
   collectionId: 12345
@@ -169,10 +154,6 @@ if (await collection.process()) {
 The `process()` method runs through all the steps described in the ["How does it work?"](how-does-it-work) section.
 
 It is also possible to go through each individual step manually and customize the behavior of **wacz-preparator**.
-
-### Quick access
-- [Preparator options and defaults](https://github.com/harvard-lil/wacz-preparator/blob/main/index.js#L80)
-- [Process() method](https://github.com/harvard-lil/wacz-preparator/blob/main/index.js#L109)
 
 [👆 Back to the summary](#summary)
 
