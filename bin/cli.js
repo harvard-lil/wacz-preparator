@@ -7,7 +7,7 @@ import { Command, Option } from 'commander'
 import log from 'loglevel'
 import logPrefix from 'loglevel-plugin-prefix'
 
-import { Preparator } from '../index.js'
+import { ArchiveItExtractor } from '../index.js'
 import { PACKAGE_INFO, LOGGING_COLORS, DEFAULT_CONCURRENCY } from '../constants.js'
 
 /** @type {Command} */
@@ -25,11 +25,26 @@ program
 //
 // Options
 //
-program.requiredOption('-u, --username <string>', 'Archive-It API username.')
+program.addOption(
+  new Option('-e, --extractor <string>', 'Web Archiving platform to extract the collection from.')
+    .choices(['archive-it'])
+    .default('archive-it')
+)
 
-program.requiredOption('-p, --password <string>', 'Archive-It API password.')
+program.addOption(
+  new Option('-u, --username <string>', 'API username (required for Archive-it).')
+    .default(null)
+)
 
-program.requiredOption('-i, --collection-id <string>', 'Id of the Archive-It collection to process.')
+program.addOption(
+  new Option('-p, --password <string>', 'API password (required for Archive-it).')
+    .default(null)
+)
+
+program.addOption(
+  new Option('-i, --collection-id <string>', 'Id of the collection to process (required for Archive-it).')
+    .default(null)
+)
 
 program.addOption(
   new Option('-o, --output-path <string>', 'Path in which wacz-preparator will work.')
@@ -73,20 +88,22 @@ program.action(async (name, options, command) => {
   //
   options = options._optionValues
 
-  // `options.username`, `options.password` and `options.collectionId` must be present
-  if (!options?.username) {
-    console.error('No Archive-It username provided.')
-    process.exit(1)
-  }
+  // `options.username`, `options.password` and `options.collectionId` must be present if extractor is "archive it"
+  if (options.extractor === 'archive-it') {
+    if (!options?.username) {
+      console.error('No username provided.')
+      process.exit(1)
+    }
 
-  if (!options?.password) {
-    console.error('No Archive-It password provided.')
-    process.exit(1)
-  }
+    if (!options?.password) {
+      console.error('No password provided.')
+      process.exit(1)
+    }
 
-  if (!options?.collectionId) {
-    console.error('No Archive-It collection Id provided.')
-    process.exit(1)
+    if (!options?.collectionId) {
+      console.error('No collection Id provided.')
+      process.exit(1)
+    }
   }
 
   // `options.outputPath` must be a folder and must be accessible.
@@ -126,10 +143,15 @@ program.action(async (name, options, command) => {
   log.info(`Log output level as been set to ${level}.`)
 
   //
-  // Initialize Preparator
+  // Initialize
   //
   try {
-    collection = new Preparator({ ...options, log })
+    switch (options.extractor) {
+      case 'archive-it':
+      default:
+        collection = new ArchiveItExtractor({ ...options, log })
+        break
+    }
   } catch (_err) {
     process.exit(1) // Logging handled by Preparator
   }

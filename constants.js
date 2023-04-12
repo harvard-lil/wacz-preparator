@@ -23,7 +23,7 @@ export const ARCHIVE_IT_PLAYBACK_URL = 'https://wayback.archive-it.org'
 /**
  * Default value for Preparator.concurrency.
  */
-export const DEFAULT_CONCURRENCY = 40
+export const DEFAULT_CONCURRENCY = 50
 
 /**
  * Colors used by the logging function
