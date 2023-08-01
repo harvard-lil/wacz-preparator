@@ -1,6 +1,6 @@
 {
   "name": "@harvard-lil/wacz-preparator",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "📚 CLI and Javascript library for packaging a remote web archive collection into a single WACZ file.",
   "main": "index.js",
   "type": "module",
