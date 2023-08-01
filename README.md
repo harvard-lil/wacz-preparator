@@ -5,7 +5,7 @@
 CLI and Javascript library for packaging a remote web archive collection into a single [WACZ file](https://specs.webrecorder.net/wacz/1.1.1/).
 
 ```bash
-wacz-preparator --extractor "archive-it" --username "lil" --password $PASSWORD --collection 12345
+wacz-preparator --extractor "archive-it" --username "lil" --password $PASSWORD --collection-id 12345
 ```
 
 **See also:** [wacz-exhibitor](https://github.com/harvard-lil/wacz-exhibitor) for embedding a self-contained web archive collection on a web page. 
