@@ -2,6 +2,10 @@
 
 [![npm version](https://badge.fury.io/js/@harvard-lil%2Fwacz-preparator.svg)](https://badge.fury.io/js/@harvard-lil%2Fwacz-preparator) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com) [![Linting](https://github.com/harvard-lil/wacz-preparator/actions/workflows/lint.yml/badge.svg?branch=main)](https://github.com/harvard-lil/wacz-preparator/actions/workflows/lint.yml)
 
+> ⚠️  **Please note**
+>
+> This repo is no longer under active development. Because it may still be useful, we have chosen not to archive it. If you use it, you may want to ensure that dependencies are up to date. If you find it useful, we would [love to know](mailto:lil@law.harvard.edu)! You can also file an issue or a pull request, though we may not respond as promptly as we would for a codebase under active development.
+
 CLI and Javascript library for packaging a remote web archive collection into a single [WACZ file](https://specs.webrecorder.net/wacz/1.1.1/).
 
 ```bash
